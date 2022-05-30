@@ -1,10 +1,8 @@
 from __future__ import print_function
-from matplotlib.pyplot import draw
 import streamlit as st
 import dill
 import pandas as pd
 import time
-from sklearn.model_selection import train_test_split
 import streamlit.components.v1 as components
 
 def load_model():
@@ -87,7 +85,6 @@ def show_predict_page():
     interest=st.selectbox("Interested course ?",qinterest)
 
     ok=st.button("Predict")
-   # ok1=st.button("PredictArray")
     if ok:
         X1={"creative":[creative],
         "writing":[writing],
@@ -122,21 +119,20 @@ def show_predict_page():
         
 
         subject=svc.predict(X)
-        y=svc.predict_proba(X)
-        st.subheader(f"Hi {y}")
+        st.subheader(f"Hi {name}")
         if(subject==interest):
            st.subheader(f"Your choice is correct. i.e, {subject} is the best option for you")
        
         else:
             st.subheader(f"It's better you choose {subject} than {interest}")
-        print(y)
+        print(X)
         with st.spinner("Processing your input.."):
             time.sleep(3)
         with st.spinner('Fetching Result Explanation'):
             predict_fn_rf = lambda x: svc.predict_proba(x).astype(float)
             exp = explainer.explain_instance(X.loc[0].values, predict_fn_rf,num_features=14,top_labels=3)
             st.subheader("Result Explanation")
-            components.html(exp.as_html(), height=800)
+            components.html(exp.as_html(), height=1800)
             
           
     
