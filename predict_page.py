@@ -2,23 +2,13 @@ from __future__ import print_function
 from matplotlib.pyplot import draw
 import streamlit as st
 import dill
-import numpy as np
 import pandas as pd
+import time
 from sklearn.model_selection import train_test_split
 import streamlit.components.v1 as components
 
-
-
-df=pd.read_csv("datanum1.csv")
-l=len(df.index)
-df=df.drop('Timestamp',axis = 1)
-df=df.drop('Name', axis = 1)
-df=df.drop('satisfied', axis = 1)
-df=df.drop('12th Stream',axis = 1)
-sub=['CIVIL','CSE','ECE','EEE','MECH','BME']
-
 def load_model():
-    with open('svc_model.pkl','rb') as file:
+    with open('svc_model1.pkl','rb') as file:
         data = dill.load(file)
     return data
     
@@ -40,35 +30,9 @@ le_projectdisliked=data["le_projectdisliked"]
 le_eng=data["le_eng"]
 le_draw=data["le_draw"]
 le_job=data["le_job"]
-le_interest=data["le_interest"]
-
-df["creative"]= le_create.transform(df["creative"])
-df["writing"]= le_write.transform(df["writing"])
-df["outdoorwork"]= le_out.transform(df["outdoorwork"])
-df["groupwork"]= le_group.transform(df["groupwork"])
-df["enjoymost"]= le_enjoymost.transform(df["enjoymost"])
-df["enjoyleast"]= le_enjyleast.transform(df["enjoyleast"])
-df["clubmost"]= le_clubmost.transform(df["clubmost"])
-df["clubleast"]= le_clubleast.transform(df["clubleast"])
-df["projectliked"]= le_projectliked.transform(df["projectliked"])
-df["projectdisliked"]= le_projectdisliked.transform(df["projectdisliked"])
-df["noengineering"]= le_eng.transform(df["noengineering"])
-df["futurejob"]= le_job.transform(df["futurejob"])
-df["interest"]= le_interest.transform(df["interest"])
-df["drawing"]= le_draw.transform(df["drawing"])
-
-print(df.head(2))
-
-
-feature=df.drop('Opted',axis = 1)
-target=df["Opted"]
-X_train, X_test, y_train, y_test = train_test_split(feature,target, test_size = 0.4)
-xt=X_train.values
-#predict_fn_rf = lambda x: svc.predict_proba(x).astype(float)
-#explainer = lime.lime_tabular.LimeTabularExplainer(xt,feature_names =["creative","writing","outdoorwork","future","groupwork","enjoymost","enjoyleast","clubmost","clubleast","projectliked","projectdisliked","noengineering","futurejob","drawing","interest"],mode="classification",kernel_width=7)
 
 def show_predict_page():
-    st.title("Hii")
+    st.title("Career Recommendation System")
 
 
     
@@ -83,23 +47,23 @@ def show_predict_page():
 
     qwriting=("Excited! I can share my theories with the world","A bit apprehensive. I get overwhelmed with so many options","Annoyed. I would much rather be given a topic with clear instructions")
 
-    qsubjectlike=("Autoshop","Biology","Business","Chemistry","Computer Science","Geography","Visual Arts","History","Math","Physics","Language Arts")
+    qsubjectlike=("Biology","Business","Chemistry","Computer Science","Social Studies","Visual Arts","Maths","Physics","Language Arts")
 
-    qsubjectdislike=("Autoshop","Biology","Business","Chemistry","Computer Science","Geography","Visual Arts","History","Math","Physics","Language Arts")
+    qsubjectdislike=("Biology","Business","Chemistry","Computer Science","Social Studies","Visual Arts","Maths","Physics","Language Arts")
 
     qclublike=("Art or design club","Autoshop club","Business club","Consulting club","Environment club","Robotics club","Hacker club","Student council")
 
     qclubdislike=("Art or design club","Autoshop club","Business club","Consulting club","Environment club","Robotics club","Hacker club","Student council")
 
-    qprojectlike=("Prototyping a musical instrument for children","Designing an Olympic village","Programming a robot that can make you dinner","Building the world's most powerful supercomputer","Designing a water treatment system for Mars","Creating a battery from recycled material","Optimizing the Uber Pool routes")
+    qprojectlike=("Prototyping a musical instrument for children","Designing an Olympic village","Programming a robot that can make you dinner","Building the world's most powerful supercomputer","Designing a low power invertor","Prototyping a Blood pressure monitor","Optimizing the Uber Pool routes")
 
-    qprojectdislike=("Prototyping a musical instrument for children","Designing an Olympic village","Programming a robot that can make you dinner","Building the world's most powerful supercomputer","Designing a water treatment system for Mars","Creating a battery from recycled material","Optimizing the Uber Pool routes")
+    qprojectdislike=("Prototyping a musical instrument for children","Designing an Olympic village","Programming a robot that can make you dinner","Building the world's most powerful supercomputer","Designing a low power invertor","Prototyping a Blood pressure monitor","Optimizing the Uber Pool routes")
 
-    qnoeng=("Applied Science","Business","Computer Science","Economics","English Literature","Environmental Studies","Finance","Geography","Graphic Design","Health Studies","Marketing","Math","Political Science","Psychology","Visual Arts")
+    qnoeng=("Science","Business","Computer Science","English Literature","Environmental Studies","Graphic Design","Health Studies","Maths","Visual Arts")
 
     qdraw=("Really good, I can draw just about anything","I am not the best, but I am not the worst","I am not very good")
 
-    qfuturejob=("Architecture","Automotive","Entrepreneurship","Construction","Health","Environment","Manufacturing","Technology")
+    qfuturejob=("Automotive","Entrepreneurship","Construction","Health","Environment","Manufacturing","Technology")
 
     qinterest=("CIVIL","CSE","ECE","EEE","MECH","BME")
 
@@ -107,9 +71,9 @@ def show_predict_page():
     tenth=st.number_input("Enter 10th percentage ")
     plus2=st.number_input("Enter 12th percentage ")
     creative=st.selectbox("How creative are you ?",qcreative)
-    writing=st.selectbox("Feelings about writing skills ?",qwriting)    
+    writing=st.selectbox("How do you feel about writing an essay ?",qwriting)    
     outdoorwork=st.selectbox("How comfortable is working in the outdoors ?",qoutdoorwork)
-    future=st.selectbox("Future work",qfuture)
+    future=st.selectbox("Which one of these choices would you prefer the most?",qfuture)
     groupwork=st.selectbox("Does working in groups excite you ?",qgroupwork)
     subjectlike=st.selectbox("Most enjoyed subject in high school ?",qsubjectlike)
     subjectdisliked=st.selectbox("Most diliked subject in high school ?",qsubjectdislike)
@@ -125,9 +89,7 @@ def show_predict_page():
     ok=st.button("Predict")
    # ok1=st.button("PredictArray")
     if ok:
-        X1={"10th":[tenth],
-        "12th":[plus2],
-        "creative":[creative],
+        X1={"creative":[creative],
         "writing":[writing],
         "outdoorwork":[outdoorwork],
         "future":[future],
@@ -140,8 +102,7 @@ def show_predict_page():
         "projectdisliked":[projectdisliked],
         "noengineering":[noeng],
         "drawing":[draw],
-        "futurejob":[futurejob],
-        "interest":[interest]}
+        "futurejob":[futurejob]}
         X=pd.DataFrame(X1) 
 
         X["creative"]= le_create.transform(X["creative"])
@@ -157,24 +118,27 @@ def show_predict_page():
         X["projectdisliked"]= le_projectdisliked.transform(X["projectdisliked"])
         X["noengineering"]= le_eng.transform(X["noengineering"])
         X["futurejob"]= le_job.transform(X["futurejob"])
-        X["interest"]= le_interest.transform(X["interest"])
         X["drawing"]= le_draw.transform(X["drawing"])
         
 
         subject=svc.predict(X)
-        st.subheader(f"Hi {name}")
+        y=svc.predict_proba(X)
+        st.subheader(f"Hi {y}")
         if(subject==interest):
-            st.subheader(f"Your choice is correct. i.e, {subject} is the best option for you")
+           st.subheader(f"Your choice is correct. i.e, {subject} is the best option for you")
+       
         else:
             st.subheader(f"It's better you choose {subject} than {interest}")
-        print(X)
-        predict_fn_rf = lambda x: svc.predict_proba(x).astype(float)
-        exp = explainer.explain_instance(X.loc[0].values, predict_fn_rf,num_features=17,top_labels=3)
-        fig1=exp.show_in_notebook()
-        fig = exp.as_pyplot_figure()
-        #st.write(fig)
-        components.html(exp.as_html(), height=800)
-   
+        print(y)
+        with st.spinner("Processing your input.."):
+            time.sleep(3)
+        with st.spinner('Fetching Result Explanation'):
+            predict_fn_rf = lambda x: svc.predict_proba(x).astype(float)
+            exp = explainer.explain_instance(X.loc[0].values, predict_fn_rf,num_features=14,top_labels=3)
+            st.subheader("Result Explanation")
+            components.html(exp.as_html(), height=800)
+            
+          
     
 
 
