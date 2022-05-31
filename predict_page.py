@@ -1,4 +1,3 @@
-from __future__ import print_function
 import streamlit as st
 import dill
 import pandas as pd
@@ -63,11 +62,9 @@ def show_predict_page():
 
     qfuturejob=("Automotive","Entrepreneurship","Construction","Health","Environment","Manufacturing","Technology")
 
-    qinterest=("CIVIL","CSE","ECE","EEE","MECH","BME")
+    qinterest=("Not sure","CIVIL","CSE","ECE","EEE","MECH","BME")
 
     name=st.text_input("Enter name")
-    tenth=st.number_input("Enter 10th percentage ")
-    plus2=st.number_input("Enter 12th percentage ")
     creative=st.selectbox("How creative are you ?",qcreative)
     writing=st.selectbox("How do you feel about writing an essay ?",qwriting)    
     outdoorwork=st.selectbox("How comfortable is working in the outdoors ?",qoutdoorwork)
@@ -122,7 +119,8 @@ def show_predict_page():
         st.subheader(f"Hi {name}")
         if(subject==interest):
            st.subheader(f"Your choice is correct. i.e, {subject} is the best option for you")
-       
+        elif(interest=="Not sure"):
+            st.subheader(f"{subject} suits you")
         else:
             st.subheader(f"It's better you choose {subject} than {interest}")
         print(X)
@@ -130,8 +128,10 @@ def show_predict_page():
             time.sleep(3)
         with st.spinner('Fetching Result Explanation'):
             predict_fn_rf = lambda x: svc.predict_proba(x).astype(float)
-            exp = explainer.explain_instance(X.loc[0].values, predict_fn_rf,num_features=14,top_labels=3)
-            st.subheader("Result Explanation")
+            exp = explainer.explain_instance(X.loc[0].values, predict_fn_rf,num_features=14,top_labels=1)
+            st.header("Result Explanation")
+            st.subheader("~Weightage of each feature is shown in the graph")
+            st.subheader(f"~Feature on the {subject} side shows the reason for recommendation")
             components.html(exp.as_html(), height=1800)
             
           
